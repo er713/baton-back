@@ -1,0 +1,11 @@
+fastapi
+fastapi-sqlalchemy
+sqlalchemy
+pydantic
+alembic
+psycopg2
+uvicorn[standard]
+python-dotenv
+aiofiles
+Pillow
+passlib[bcrypt]
