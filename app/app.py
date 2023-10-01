@@ -1,4 +1,11 @@
-from fastapi import FastAPI, Depends, WebSocket, WebSocketDisconnect, Header
+from fastapi import (
+    FastAPI,
+    Depends,
+    WebSocket,
+    WebSocketDisconnect,
+    Header,
+    BackgroundTasks,
+)
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from sqlalchemy.sql import text
@@ -9,6 +16,7 @@ from .utils import prepare_image
 from .socket_handler import ConnectionManager
 from app.routers import user, wild_animal, domestic_animal, detection, camera
 from app.db.database import Base, engine, get_db, Session
+from ..connect import download_messages, CamInfo
 
 
 app = FastAPI()
@@ -59,9 +67,8 @@ async def accept_client(
                 print("data is not None:", data)
                 db.execute(
                     text(
-                        "UPDATE detections SET resolved = true WHERE uuid = :uuid"
+                        f"UPDATE detections SET resolved = true WHERE uuid = '{data}' ;"
                     ),
-                    {"uuid": data},
                 )
             print("\n\n\n")
             print(data)
@@ -76,6 +83,7 @@ async def accept_client(
                 .mappings()
                 .all()
             )
+            db.commit()
 
             results = []
             for row in detections_to_send:
@@ -139,3 +147,24 @@ def create_table(db: Session = Depends(get_db)):
     Base.metadata.create_all(bind=engine)
     db.commit()
     return {"status": "success"}
+
+
+@app.get("/api/run_camera_detection")
+def run_camera_detection(
+    background_tasks: BackgroundTasks, db: Session = Depends(get_db)
+):
+    cameras = (
+        db.execute("SELECT * FROM cameras WHERE url <> ''").migrates().all()
+    )
+    for _camera in cameras:
+        _camera = dict(_camera)
+        background_tasks.add_task(
+            download_messages,
+            CamInfo(
+                _camera["address"],
+                _camera["url"],
+                _camera["address"].split(" ", 1)[0],
+                _camera["uuid"],
+            ),
+            db,
+        )

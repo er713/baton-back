@@ -16,10 +16,11 @@ INSERT INTO submits (uuid, coordinates, reported_animal, report_ts) VALUES
 
 -- CAMERAS
 INSERT INTO cameras (uuid, coordinates, address, active, url) VALUES
-    ('bca6752d-62ad-4dd5-b789-139869e3801f', ARRAY [50.049683, 19.944544], 'Somewhere-krakow 12', true, 'http://krakow-camera.pl'),
-    ('7f05cfff-532d-4dd3-af3b-cd0696ea4f28', ARRAY [50.012100, 20.985842], 'Somewhere-tarnow 34', true, 'http://tarnow-camera.pl'),
-    ('4d95487b-9c85-440b-9394-fce8a7083785', ARRAY [50.041187, 21.999121], 'Somewhere-rzeszow 56', true, 'http://rzeszow-camera.pl'),
-    ('4457dca0-ce31-47c7-a1ed-c0e17fce7891', ARRAY [53.428543, 14.552812], 'Somewhere-szczecin 98', false, 'http://szczecin-camera.pl');
+    ('bca6752d-62ad-4dd5-b789-139869e3801f', ARRAY [50.049683, 19.944544], 'Somewhere-krakow 12', true, ''),
+    ('7f05cfff-532d-4dd3-af3b-cd0696ea4f28', ARRAY [50.012100, 20.985842], 'Somewhere-tarnow 34', true, ''),
+    ('4d95487b-9c85-440b-9394-fce8a7083785', ARRAY [50.041187, 21.999121], 'Somewhere-rzeszow 56', true, ''),
+    ('4d95487b-9c85-440b-9394-cd0696ea4f28', ARRAY [48.021187, 24.999121], 'Nowy Targ 53', true, 'https://hstream1.webcamera.pl/nowytarg_cam_0f85a4/nowytarg_cam_0f85a4.stream/'),
+    ('4457dca0-ce31-47c7-a1ed-c0e17fce7891', ARRAY [53.428543, 14.552812], 'Somewhere-szczecin 98', false, '');
 
 
 

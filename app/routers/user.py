@@ -81,12 +81,12 @@ def check_token(token, db) -> bool:
         return False
     user = (
         db.execute(
-            text(f"SELECT uuid FROM users WHERE uuid='{decoded['uuid']}'")
+            text(f"SELECT username FROM users WHERE uuid='{decoded['uuid']}'")
         )
         .mappings()
         .all()
     )
-    return bool(user)
+    return user
 
 
 @router.post("/auth")
@@ -96,11 +96,14 @@ def check_auth(
 ):
     try:
         bearer = request.headers.get("authorization").split(" ", 1)[1]
-        if check_token(bearer, db):
-            return Response(status_code=200)
+        username = check_token(bearer, db)
+        if username:
+            for user in username:
+                return dict(user)
         else:
             return Response(status_code=403)
     except Exception:
+        print("@@@@@@")
         return Response(status_code=403)
 
 

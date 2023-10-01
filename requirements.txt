@@ -13,3 +13,6 @@ pydantic_settings
 psycopg2-binary
 pyjwt
 python-multipart
+httpx
+kenning[object_detection,torch,onnx,onnxruntime] @ git+https://github.com/antmicro/kenning.git
+imutils
