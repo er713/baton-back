@@ -36,8 +36,7 @@ def prepare_image(image_path: str):
 async def save_image(filename, in_file, save_size=None):
     """TODO: save in 1280x720"""
     try:
-        content = await in_file.read()  # async read
-        decoded_image = b64decode(content)
+        decoded_image = b64decode(in_file)
         image = Image.open(BytesIO(decoded_image))
         if save_size:
             image = image.resize(save_size)

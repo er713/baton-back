@@ -3,12 +3,13 @@ fastapi-sqlalchemy
 sqlalchemy
 pydantic
 alembic
-psycopg2
 uvicorn[standard]
 python-dotenv
 aiofiles
 Pillow
 passlib[bcrypt]
-python-socketio
-fastapi_socketio
 certifi
+pydantic_settings
+psycopg2-binary
+pyjwt
+python-multipart

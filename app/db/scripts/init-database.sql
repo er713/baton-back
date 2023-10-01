@@ -28,6 +28,7 @@ CREATE  TABLE IF NOT EXISTS detections (
     detected_animal VARCHAR(64) NOT NULL,
     confidence REAL NOT NULL,
     detection_ts TIMESTAMP NOT NULL,
+    resolved BOOLEAN NOT NULL,
     camera_id UUID,
     submit_id UUID,
 
