@@ -9,3 +9,6 @@ python-dotenv
 aiofiles
 Pillow
 passlib[bcrypt]
+python-socketio
+fastapi_socketio
+certifi

@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS cameras (
 );
 
 CREATE TABLE IF NOT EXISTS submits (
-    id SERIAL PRIMARY KEY,
+    uuid UUID PRIMARY KEY,
     coordinates REAL [] NOT NULL,
     reported_animal VARCHAR(64),
     report_ts TIMESTAMP NOT NULL
@@ -29,8 +29,8 @@ CREATE  TABLE IF NOT EXISTS detections (
     confidence REAL NOT NULL,
     detection_ts TIMESTAMP NOT NULL,
     camera_id UUID,
-    submit_id INT,
+    submit_id UUID,
 
     FOREIGN KEY (camera_id) REFERENCES cameras(uuid),
-    FOREIGN KEY (submit_id) REFERENCES submits(id)
+    FOREIGN KEY (submit_id) REFERENCES submits(uuid)
 );
