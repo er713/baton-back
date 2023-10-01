@@ -14,13 +14,13 @@ from ..db.database import get_db, Base, engine
 router = APIRouter()
 
 
-@router.get("/", response_model=schemas.CameraBaseSchema)
+@router.get("/")
 async def get_cameras(
     db: Session = Depends(get_db),
     limit: int = 100,
     skip: int = 0,
     search: str = "",
 ):
-    cameras = db.execute(text("SELECT * FROM cameras")).mappings().all()
+    cameras = db.execute(text("SELECT * FROM cameras;")).mappings().all()
 
-    return {"status": "success", "results": len(cameras), "cameras": cameras}
+    return {"status": "success", "count": len(cameras), "cameras": cameras}

@@ -30,10 +30,10 @@ class Detection(Base):
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uid.uuid4)
     detected_animal = Column(String(64), nullable=False)
     confidence = Column(Float, nullable=False)
-    # frame_path = Column(String(255), nullable=False)
     detection_ts = Column(TIMESTAMP, nullable=False)
     camera_id = Column(UUID, ForeignKey("cameras.uuid"))
-    submit_id = Column(Integer, ForeignKey("submits.id"))
+    submit_id = Column(UUID, ForeignKey("submits.uuid"))
+    resolved = Column(Boolean, nullable=False, default=False)
 
     camera = relationship("Camera")
     submit = relationship("Submit")
@@ -41,9 +41,8 @@ class Detection(Base):
 
 class Submit(Base):
     __tablename__ = "submits"
-    id = Column(Integer, primary_key=True, index=True)
+    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uid.uuid4)
     coordinates = Column(ARRAY(Float), nullable=False)
-    # frame_path = Column(String(255), nullable=True)
     reported_animal = Column(String(255), nullable=True)
     report_ts = Column(TIMESTAMP, nullable=False)
 

@@ -24,10 +24,12 @@ def get_format(content):
 
 def prepare_image(image_path: str):
     with open(image_path, "rb") as image_file:
+        print("loading file ", image_path)
         encoded_image_string = b64encode(image_file.read())
+        print("loaded file ", image_path)
     return {
         "mime": "image/png",
-        "image": encoded_image_string,
+        "frame": encoded_image_string,
     }
 
 

@@ -7,22 +7,22 @@ class UserBaseSchema(BaseModel):
     uuid: uuid.UUID
     username: str
     email: str
-    password: str # constr(min_length=8, max_length=64)
+    password: str  # constr(min_length=8, max_length=64)
 
     class Config:
         from_attributes = True
 
 
 class CreateUserSchema(UserBaseSchema):
-    password: str # constr(min_length=8, max_length=64)
+    password: str  # constr(min_length=8, max_length=64)
     confirm_password: str
     # role: str = "user"
     # verified: bool = False
 
 
 class LoginUserSchema(BaseModel):
-    email: str
-    password: str # constr(min_length=8, max_length=64)
+    username: str
+    password: str  # constr(min_length=8, max_length=64)
 
 
 class UserResponse(UserBaseSchema):
@@ -37,6 +37,7 @@ class DetectionBaseSchema(BaseModel):
     # frame_path: str
     confidence: float
     detection_ts: datetime
+    resolved: bool
     camera_id: uuid.UUID
     submit_id: int
 
