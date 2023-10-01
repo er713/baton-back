@@ -3,7 +3,15 @@ from datetime import datetime
 
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-from fastapi import Depends, HTTPException, status, APIRouter, Response, UploadFile
+from fastapi import (
+    Depends,
+    HTTPException,
+    status,
+    APIRouter,
+    Response,
+    UploadFile,
+    Request,
+)
 
 from ..db import models, schemas
 from ..db.database import get_db
@@ -23,7 +31,7 @@ async def get_submits(
     search: str = "",
 ):
     submits = db.execute(text("SELECT * FROM submits")).mappings().all()
-    """ TODO: read the image from the frame_path (base64 png) 
+    """ TODO: read the image from the frame_path (base64 png)
      (filename: UUID_data.png)
      """
 
@@ -32,28 +40,33 @@ async def get_submits(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def post_submit(
-    submit: schemas.SubmitBaseSchema,
-    in_file: UploadFile = None,
+    submit: Request,
+    # in_file: UploadFile = None,
     db: Session = Depends(get_db),
 ):
     """TODO: read the image from the frame_path (base64 png)
     (filename: UUID_data.png)
     """
+    body = await submit.json()
+    print(body)
+    # print(type(submit["frame"]))
+    # print(submit["frame"])
+    # breakpoint()
+    frame = body["frame"].split(",", 1)[1]
     print("received post request")
     report_ts = datetime.now()
     submit_uuid = uuid.uuid4()
-    if in_file:
+    if frame:
         print("Saving image locally")
         save_image(
             filename=f"./examples/{submit_uuid}_data.png",
-            file=in_file,
-            size=(1280, 720),
+            in_file=frame,
+            save_size=(1280, 720),
         )
     print("Submitting to database")
     db_submit = models.Submit(
         uuid=submit_uuid,
-        coordinates=submit.coordinates,
-        reported_animal=submit.reported_animal,
+        coordinates=body["localization"],
         report_ts=report_ts,
     )
 
@@ -65,4 +78,4 @@ async def post_submit(
     failed = False  # TODO: ai processing result (True or False) with detections results
     if failed:
         return status.HTTP_406_NOT_ACCEPTABLE
-    return status.HTTP_202_ACCEPTED
+    return {"detectedAnimal": "Dog"}

@@ -1,11 +1,9 @@
-from fastapi import FastAPI, Depends, WebSocket, WebSocketDisconnect
-from fastapi_socketio import SocketManager
-from socketio import AsyncServer
+from fastapi import FastAPI, Depends, WebSocket, WebSocketDisconnect, Header
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from app.config import settings
 from sqlalchemy.sql import text
 import datetime
+import jwt
 
 from .utils import prepare_image
 from .socket_handler import ConnectionManager
@@ -31,25 +29,38 @@ app.add_middleware(
 )
 
 app.include_router(user.router, tags=["Users"], prefix="/api/users")
-app.include_router(wild_animal.router, tags=["WildAnimals"], prefix="/api/wild-animal")
 app.include_router(
-    domestic_animal.router, tags=["DomesticAnimals"], prefix="/api/domestic-animal"
+    wild_animal.router, tags=["WildAnimals"], prefix="/api/animal"
+)
+app.include_router(
+    domestic_animal.router,
+    tags=["DomesticAnimals"],
+    prefix="/api/domestic-animal",
 )
 app.include_router(camera.router, tags=["Cameras"], prefix="/api/cameras")
-app.include_router(detection.router, tags=["Detections"], prefix="/api/detections")
+app.include_router(
+    detection.router, tags=["Detections"], prefix="/api/detections"
+)
 
 
 @app.websocket("/ws")
-async def accept_client(websocket: WebSocket, db: Session = Depends(get_db)):
-    await manager.connect(websocket)
-    print("\twebsocket accepted")
+async def accept_client(
+    websocket: WebSocket, token: str, db: Session = Depends(get_db)
+):
+    if token and user.check_token(token, db):
+        await manager.connect(websocket)
+        print("\twebsocket accepted")
+    else:
+        return
     try:
         while True:
             data = await websocket.receive_text()
-            if data != 'Connected':
+            if data != "Connected":
                 print("data is not None:", data)
                 db.execute(
-                    text("UPDATE detections SET resolved = true WHERE uuid = :uuid"),
+                    text(
+                        "UPDATE detections SET resolved = true WHERE uuid = :uuid"
+                    ),
                     {"uuid": data},
                 )
             print("\n\n\n")
@@ -74,7 +85,9 @@ async def accept_client(websocket: WebSocket, db: Session = Depends(get_db)):
                     "uuid": str(dict_row["uuid"]),
                     "detectedAnimal": dict_row["detected_animal"],
                     "confidence": dict_row["confidence"],
-                    "timestamp": datetime.datetime.isoformat(dict_row["detection_ts"]),
+                    "timestamp": datetime.datetime.isoformat(
+                        dict_row["detection_ts"]
+                    ),
                     "localization": dict_row["coordinates"],
                 }
                 image_path = "./examples/" + new_row["uuid"] + "_data.png"
@@ -91,17 +104,17 @@ async def accept_client(websocket: WebSocket, db: Session = Depends(get_db)):
         # await websocket.send_text(f"Accepted: {token}")
 
 
-@app.websocket("/ws/resolve-detection")
-async def resolve_detection(websocket: WebSocket):
-    await websocket.accept()
-    print("websocket accepted")
-    while True:
-        data = await websocket.receive_text()
-        print("\n\n\n")
-        print(type(data), data, data.split("token")[-1])
-        print("\n\n\n")
-        await websocket.send_json({"detections": ["detection1", "detection2"]})
-        # await websocket.send_text(f"Accepted: {token}")
+# @app.websocket("/ws/resolve-detection")
+# async def resolve_detection(websocket: WebSocket):
+#     await websocket.accept()
+#     print("websocket accepted")
+#     while True:
+#         data = await websocket.receive_text()
+#         print("\n\n\n")
+#         print(type(data), data, data.split("token")[-1])
+#         print("\n\n\n")
+#         await websocket.send_json({"detections": ["detection1", "detection2"]})
+#         # await websocket.send_text(f"Accepted: {token}")
 
 
 # TODO: update detections

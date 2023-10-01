@@ -1,6 +1,9 @@
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, constr, Base64UrlBytes, Field
+
+# from pydantic.fields import LargeBinary
 from datetime import datetime
 import uuid
+from typing import Tuple, Literal, Any
 
 
 class UserBaseSchema(BaseModel):
@@ -63,6 +66,15 @@ class SubmitBaseSchema(BaseModel):
     reported_animal: str
     # frame: str
     report_ts: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class SubmitMinSchema(BaseModel):
+    # ser_json_bytes: Literal['utf8', 'base64']
+    frame: Any
+    localization: Tuple[float, float]
 
     class Config:
         from_attributes = True
